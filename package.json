@@ -1,0 +1,37 @@
+{
+  "name": "chooser",
+  "version": "1.0.0",
+  "description": "This library aims to completely replace `switch` case logic (which is unfavorable in Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThisseasX/chooser.git"
+  },
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "keywords": [
+    "choose",
+    "choice",
+    "switch",
+    "case",
+    "fp",
+    "functional",
+    "programming"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "author": "ThisseasX",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ThisseasX/chooser/issues"
+  },
+  "homepage": "https://github.com/ThisseasX/chooser#readme",
+  "dependencies": {
+    "lodash": "^4.17.15"
+  },
+  "devDependencies": {
+    "jest": "^25.3.0"
+  }
+}
