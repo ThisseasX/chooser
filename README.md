@@ -1,7 +1,15 @@
 # chooser
 
-This library aims to completely replace `switch` case logic (which is unfavorable in Functional Programming), with a
-simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.
+Small, but fully featured, library that aims to completely replace `switch` case logic (which is unfavorable in Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.
+
+# Features
+
+- Map cases to results.
+- Map multiple cases to the same result.
+- Refer from one case to another by `ref`-ing its index.
+- Refer from one case to another by `use`-ing its `when` value.
+- Leverage the [lazy](https://en.wikipedia.org/wiki/Lazy_evaluation) nature of functions to compute a result only when needed, and not at the time of the case declaration.
+- If a function is intended to be returned as is, it can be put under the `eager` key.
 
 # Installation
 
@@ -47,15 +55,6 @@ type Choice = {
   eager?: Function;
 };
 ```
-
-# Features
-
-- Map cases to results.
-- Map multiple cases to the same result.
-- Refer from one case to another by `ref`-ing its index.
-- Refer from one case to another by `use`-ing its `when` value.
-- Leverage the [lazy](https://en.wikipedia.org/wiki/Lazy_evaluation) nature of functions to compute a result only when needed, and not at the time of the case declaration.
-- If a function is intended to be returned as is, it can be put under the `eager` key.
 
 # Examples
 
