@@ -11,9 +11,13 @@ const choices1 = [
   { 8: 2 },
   { when: 9, then: testFn },
   { when: 10, eager: testFn },
+  { when: 11, ref: 0 },
+  { when: 12, use: 0 },
+  { when: 0, then: [7, 8, 9] },
 ];
 
 const choices2 = {
+  0: [7, 8, 9],
   1: [1, 2, 3],
   2: () => [4, 5, 6],
   3: '$0',
@@ -22,6 +26,8 @@ const choices2 = {
   6: { use: 5 },
   7: testFn,
   8: { eager: testFn },
+  9: { ref: 0 },
+  10: { use: 0 },
 };
 
 const testCases = [
@@ -90,12 +96,27 @@ const testCases = [
   {
     choices: choices1,
     input: 11,
-    defaultValue: [7, 8, 9],
-    expected: [7, 8, 9],
+    expected: [1, 2, 3],
   },
   {
     choices: choices1,
     input: 12,
+    expected: [7, 8, 9],
+  },
+  {
+    choices: choices1,
+    input: 100,
+    defaultValue: [10, 11, 12],
+    expected: [10, 11, 12],
+  },
+  {
+    choices: choices1,
+    input: 0,
+    expected: [7, 8, 9],
+  },
+  {
+    choices: choices1,
+    input: 14,
     expected: undefined,
   },
   {
@@ -111,22 +132,22 @@ const testCases = [
   {
     choices: choices2,
     input: 3,
-    expected: [1, 2, 3],
+    expected: [7, 8, 9],
   },
   {
     choices: choices2,
     input: 4,
-    expected: [1, 2, 3],
+    expected: [4, 5, 6],
   },
   {
     choices: choices2,
     input: 5,
-    expected: [1, 2, 3],
+    expected: [7, 8, 9],
   },
   {
     choices: choices2,
     input: 6,
-    expected: [1, 2, 3],
+    expected: [7, 8, 9],
   },
   {
     choices: choices2,
@@ -137,6 +158,16 @@ const testCases = [
     choices: choices2,
     input: 8,
     expected: testFn,
+  },
+  {
+    choices: choices2,
+    input: 9,
+    expected: [7, 8, 9],
+  },
+  {
+    choices: choices2,
+    input: 10,
+    expected: [7, 8, 9],
   },
 ];
 

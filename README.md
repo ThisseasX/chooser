@@ -51,9 +51,10 @@ type Choice = {
 # Features
 
 - Map cases to results.
-- Refer from one case to the other by `ref`-ing its index.
-- Refer from one case to the other by `use`-ing its `when` value.
-- Leverage the lazy nature of functions to compute a result only when needed, and not at the time of the case declaration.
+- Map multiple cases to the same result.
+- Refer from one case to another by `ref`-ing its index.
+- Refer from one case to another by `use`-ing its `when` value.
+- Leverage the [lazy](https://en.wikipedia.org/wiki/Lazy_evaluation) nature of functions to compute a result only when needed, and not at the time of the case declaration.
 - If a function is intended to be returned as is, it can be put under the `eager` key.
 
 # Examples
@@ -141,7 +142,23 @@ choose(2); // => 'one'
 choose(3); // => 'one'
 ```
 
-Using plain object as a `choice` in an array of `choices`:
+> **Note**: A caveat of using a plain object as `choices` is that in the case of numbered keys, the keys are automatically sorted by the language. This can lead to wrong `ref`s.
+
+Demonstrating the sorted keys problem:
+
+```js
+const chooser = require('chooser');
+
+const choose = chooser({
+  2: 'two',
+  1: 'one',
+  3: { ref: 0 },
+});
+
+choose(3); // => 'one' instead of the usually expected 'two'
+```
+
+Using a plain object as a `choice` in an array of `choices`:
 
 ```js
 const chooser = require('chooser');

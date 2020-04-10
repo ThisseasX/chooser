@@ -50,9 +50,9 @@ const transformChoiceObjectToArray = (choices) =>
 
     const choice = {
       when: key,
-      ref: ref || nth(1, match),
+      ref: !isUndefined(ref) ? ref : nth(1, match),
       use: !isUndefined(use) ? toString(use) : undefined,
-      then: then || isPlainObject(value) ? omit(KNOWN_KEYS, value) : value,
+      then: !isUndefined(then) ? then : isPlainObject(value) ? omit(KNOWN_KEYS, value) : value,
       eager,
     };
 
@@ -98,7 +98,7 @@ const normalizeChoices = (choices) =>
  * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Array<Object.<string, any>> | Object.<string, any>} choices A choice array or a plain object.
  * @param {any} input The user's input. Can be anything that will correspond to a `when` value.
  */
-const transformChoice = (choices, input) =>
+const normalizeInput = (choices, input) =>
   isPlainObject(choices) ? toString(input) : input;
 
 /**
@@ -112,16 +112,16 @@ const transformChoice = (choices, input) =>
  */
 const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
   return flow(
-    index
+    !isUndefined(index)
       ? constant(choices[index])
       : find(({ when }) =>
           isArray(when) ? when.some(equalityFn(input)) : equalityFn(input)(when),
         ),
     defaultTo({}),
     (selectedChoice) =>
-      selectedChoice.ref
+      !isUndefined(selectedChoice.ref)
         ? findChoiceFromArray(input, choices, equalityFn, selectedChoice.ref)
-        : selectedChoice.use
+        : !isUndefined(selectedChoice.use)
         ? findChoiceFromArray(selectedChoice.use, choices, equalityFn)
         : selectedChoice,
   )(choices);
@@ -134,8 +134,9 @@ const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
  * It will attempt to resolve it by finding the entry in the choice array whose `when` corresponds to the given
  * `input`. If a `ref` exists in that entry, it will instead find its referenced entry. IF `use` exists in that entry,
  * it will instead try to find an entry that corresponds to the given `use` instead of `when`.
- * 
- * The matching between the input and the 
+ *
+ * The matching between the `input` and the `when` is performed by running the `equalityFn` with the `input` against the value of `when`,
+ * or against each element in `when` if it is an array.
  *
  * After all recursive calls have returned and a choice has been found, the `then` of the choice is returned.
  * If the `then` is a function, it is called and its result is returned instead, to leverage lazy evaluation.
@@ -151,10 +152,9 @@ const chooser = (choices, defaultValue, equalityFn) =>
   function choose(input) {
     return flow(
       spread(findChoiceFromArray),
-      (choice) =>
-        !isUndefined(choice.eager) ? choice.eager : result('then', choice),
+      (choice) => (!isUndefined(choice.eager) ? choice.eager : result('then', choice)),
       defaultTo(defaultValue),
-    )([transformChoice(choices, input), normalizeChoices(choices), equalityFn]);
+    )([normalizeInput(choices, input), normalizeChoices(choices), equalityFn]);
   };
 
 module.exports = chooser;
