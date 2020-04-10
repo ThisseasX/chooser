@@ -65,13 +65,13 @@ const testCases = [
     choices: choices1,
     input: 7,
     expected: 1,
-    equalityFn: (a) => (b) => a == b,
+    equalityFn: (input) => (when) => input == when,
   },
   {
     choices: choices1,
     input: 8,
     expected: 2,
-    equalityFn: (a) => (b) => a == b,
+    equalityFn: (input) => (when) => input == when,
   },
   {
     choices: choices1,

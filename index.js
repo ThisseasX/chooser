@@ -107,7 +107,7 @@ const normalizeInput = (choices, input) =>
  *
  * @param {any} input The user's input. Can be anything that will correspond to a `when` value.
  * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Array<Object.<string, any>> | Object.<string, any>} choices A choice array or a plain object.
- * @param {(a: any) => (b: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
+ * @param {(input: any) => (when: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
  * @param {number} index Used to recursively refer to a different choice entry by using a `ref`.
  */
 const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
@@ -146,7 +146,7 @@ const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
  *
  * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Array<Object.<string, any>> | Object.<string, any>} choices A choice array or a plain object.
  * @param {any} defaultValue A default value to be returned if the `input` does not yield a choice.
- * @param {(a: any) => (b: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
+ * @param {(input: any) => (when: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
  */
 const chooser = (choices, defaultValue, equalityFn) =>
   function choose(input) {

@@ -181,7 +181,7 @@ Instead it can be fixed by providing a non-strict equality function.
 ```js
 const chooser = require('chooser');
 
-const equalityFn = a => b => a == b;
+const equalityFn = input => when => input == when;
 
 const choose = chooser([
   { 1: 'one' }
@@ -190,6 +190,29 @@ const choose = chooser([
 
 choose(1); // => 'one'
 choose(2); // => 'two'
+```
+
+Another creative use of `equalityFn`:
+
+```js
+const chooser = require('chooser');
+
+const equalityFn = (input) => (when) => input.nested.value == when;
+
+const choose = chooser(
+  [
+    { when: 1, then: 'one' },
+    { when: 2, then: 'two' },
+  ],
+  undefined,
+  equalityFn,
+);
+
+const obj1 = { nested: { value: 1 } };
+const obj2 = { nested: { value: 2 } };
+
+choose(obj1); // => 'one'
+choose(obj2); // => 'two'
 ```
 
 Specifying a `defaultValue`:
