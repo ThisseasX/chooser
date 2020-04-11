@@ -1,10 +1,8 @@
 const {
-  over,
   values,
   set,
   isFunction,
   isUndefined,
-  nth,
   toString,
   isArray,
   constant,
@@ -31,8 +29,8 @@ const ARG_PATTERN = /^\{(?:\$(\d+?))?(?:#(.+?))?\}$/;
  * const plain = {
  *   one: 1,
  *   two: 2,
- *   three: '$1',
- *   four: '#one',
+ *   three: '{$1}',
+ *   four: '{#one}',
  * };
  *
  * const transformed = transformChoiceObjectToArray(plain);
@@ -50,7 +48,7 @@ const transformChoiceObjectToArray = (choices) =>
   Object.entries(choices).reduce((resultArray, [key, value]) => {
     const match = ARG_PATTERN.exec(value);
 
-    const [ref, use] = over([nth(1), nth(2)])(match);
+    const [, ref, use] = match || [];
 
     const choice = {
       when: key,
@@ -93,8 +91,8 @@ const normalizeInput = (choices, input) =>
 
 /**
  * Normalizes the library's main args before passing them on.
- * 
- * @param {{input?: any, choices?: Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>, equalityFn?: (input: any) => (when: any) => boolean}} args The library's main args supplied by the user, that will first be normalized. 
+ *
+ * @param {{input?: any, choices?: Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>, equalityFn?: (input: any) => (when: any) => boolean}} args The library's main args supplied by the user, that will first be normalized.
  */
 const normalizeArgs = ({ input, choices, equalityFn }) =>
   flow(
@@ -155,9 +153,16 @@ const chooser = (choices, defaultValue, equalityFn) =>
   function choose(input, equalityFnOverride) {
     return flow(
       spread(findChoiceFromArray),
-      (choice) => !isUndefined(choice.eager) ? choice.eager : result('then', choice),
+      (choice) =>
+        !isUndefined(choice.eager) ? choice.eager : result('then', choice),
       defaultTo(defaultValue),
-    )(normalizeArgs({ input, choices, equalityFn: equalityFnOverride || equalityFn }));
+    )(
+      normalizeArgs({
+        input,
+        choices,
+        equalityFn: equalityFnOverride || equalityFn,
+      }),
+    );
   };
 
 module.exports = chooser;
