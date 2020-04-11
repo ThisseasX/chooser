@@ -1,4 +1,4 @@
-const chooser = require('../..');
+import chooser from '../../src';
 
 const fn = () => 'one';
 
@@ -11,7 +11,7 @@ choose(1); // => 'one'
 choose(2); // => Function: fn
 
 ///////////////////////////////////////////////////////////////////////////////
-const { strictEqual } = require('assert');
+import { strictEqual } from 'assert';
 
 describe('eager demo', () => {
   test('is accurate', () => {

@@ -17,7 +17,8 @@
     "url": "https://github.com/ThisseasX/chooser/issues"
   },
   "scripts": {
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "build": "tsc"
   },
   "files": [
     "dist",
@@ -27,7 +28,11 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
+    "@types/jest": "^25.2.1",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "^13.11.1",
     "jest": "^25.3.0",
+    "ts-jest": "^25.3.1",
     "typescript": "^3.8.3"
   },
   "keywords": [

@@ -1,6 +1,6 @@
-const chooser = require('../..');
+import chooser from '../../src';
 
-const equalityFn = (input) => (when) => input.nested.value == when;
+const equalityFn = (input, when) => input.nested.value == when;
 
 const choose = chooser(
   [
@@ -18,7 +18,7 @@ choose(obj1); // => 'one'
 choose(obj2); // => 'two'
 
 ///////////////////////////////////////////////////////////////////////////////
-const { strictEqual } = require('assert');
+import { strictEqual } from 'assert';
 
 describe('equality demo', () => {
   test('is accurate', () => {

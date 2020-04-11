@@ -1,7 +1,7 @@
-const chooser = require('../..');
+import chooser from '../../src';
 
-const equalityFnPerson = (input) => (when) => input.person.age == when;
-const equalityFnDog = (input) => (when) => input.dog.age == when;
+const equalityFnPerson = (input, when) => input.person.age == when;
+const equalityFnDog = (input, when) => input.dog.age == when;
 
 const choose = chooser([
   { when: 28, then: 'I am 28 years old!' },
@@ -17,7 +17,7 @@ choose(data, equalityFnPerson); // => 'I am 28 years old!'
 choose(data, equalityFnDog); // => 'Woof woof!'
 
 ///////////////////////////////////////////////////////////////////////////////
-const { strictEqual } = require('assert');
+import { strictEqual } from 'assert';
 
 describe('equality override demo', () => {
   test('is accurate', () => {

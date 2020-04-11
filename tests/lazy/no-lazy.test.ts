@@ -1,6 +1,6 @@
-const chooser = require('../..');
-const { callTimes } = require('./util');
-const { deepStrictEqual } = require('assert');
+import chooser from '../../src';
+import { callTimes } from './util';
+import { deepStrictEqual } from 'assert';
 
 const callCount = {
   1: 0,
