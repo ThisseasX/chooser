@@ -152,12 +152,12 @@ const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
  * @param {(input: any) => (when: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
  */
 const chooser = (choices, defaultValue, equalityFn) =>
-  function choose(input) {
+  function choose(input, equalityFnOverride) {
     return flow(
       spread(findChoiceFromArray),
       (choice) => !isUndefined(choice.eager) ? choice.eager : result('then', choice),
       defaultTo(defaultValue),
-    )(normalizeArgs({ input, choices, equalityFn }));
+    )(normalizeArgs({ input, choices, equalityFn: equalityFnOverride || equalityFn }));
   };
 
 module.exports = chooser;

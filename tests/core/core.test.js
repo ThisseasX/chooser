@@ -1,4 +1,4 @@
-const chooser = require('..');
+const chooser = require('../..');
 const testCases = require('./test-cases');
 const { deepStrictEqual } = require('assert');
 
