@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "jest --watchAll",
-    "test:ci": "jest --ci",
+    "test:ci": "jest --ci --coverage",
     "build": "rollup -c"
   },
   "files": [
