@@ -1,5 +1,5 @@
 declare type Choice = {
-    when?: any;
+    when: any;
     then?: any;
     ref?: number;
     use?: any;
