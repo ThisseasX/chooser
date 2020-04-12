@@ -1,5 +1,17 @@
 # chooser changelog
 
+## 3.0.1
+
+_2020-04-12_
+
+Change default export to named export to fix broken CommonJS module types.
+
+## 2.0.3
+
+_2020-04-12_
+
+Add [Travis CI](https://travis-ci.com/) and [Codecov](https://codecov.io/).
+
 ## 2.0.2
 
 _2020-04-12_
