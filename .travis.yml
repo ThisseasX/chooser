@@ -6,5 +6,8 @@ cache:
     - 'node_modules'
 install:
   - npm install
-script:
+scripts:
   - npm run test:ci
+  - npm install codecov -g
+after_success:
+  - codecov
