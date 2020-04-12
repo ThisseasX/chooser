@@ -42,7 +42,7 @@ $ npm install chooser
 # Usage
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser([
   { when: [1, 2], then: 'one' },
@@ -83,7 +83,7 @@ type Choice = {
 Basic example:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser([
   { when: [1, 2], then: 'one' },
@@ -102,7 +102,7 @@ choose(5); // => 'two'
 Leveraging lazy evaluation:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser([
   { when: 1, then: () => 'one' },
@@ -116,7 +116,7 @@ choose(2); // => 'two'
 Overriding lazy evaluation to return the function as is:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const fn = () => 'one';
 
@@ -132,7 +132,7 @@ choose(2); // => Function: fn
 Using a plain object:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser({
   1: 'one',
@@ -164,7 +164,7 @@ choose(3); // => 'two'
 Using `ref` shorthand in plain objects:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser({
   1: 'one',
@@ -182,7 +182,7 @@ choose(3); // => 'one'
 Demonstrating the sorted keys problem:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser({
   2: 'two',
@@ -196,7 +196,7 @@ choose(3); // => 'one' instead of the usually expected 'two'
 Providing a custom `equalityFn` at case declaration:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const equalityFn = (input, when) => input.nested.value == when;
 
@@ -239,7 +239,7 @@ choose(data, equalityFnDog); // => 'Woof woof!'
 Specifying a `defaultValue`:
 
 ```js
-const chooser = require('chooser');
+const { chooser } = require('chooser');
 
 const choose = chooser(
   [

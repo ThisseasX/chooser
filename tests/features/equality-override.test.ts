@@ -1,4 +1,4 @@
-import chooser from '../../src';
+import { chooser } from '../../src';
 
 const equalityFnPerson = (input, when) => input.person.age == when;
 const equalityFnDog = (input, when) => input.dog.age == when;

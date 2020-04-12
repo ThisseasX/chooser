@@ -1,4 +1,4 @@
-import chooser from '../../src';
+import { chooser } from '../../src';
 import testCases from './test-cases';
 import { deepStrictEqual } from 'assert';
 

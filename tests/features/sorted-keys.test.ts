@@ -1,4 +1,4 @@
-import chooser from '../../src';
+import { chooser } from '../../src';
 
 const choose = chooser({
   2: 'two',

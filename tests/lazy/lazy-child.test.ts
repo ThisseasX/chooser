@@ -1,4 +1,4 @@
-import chooser from '../../src';
+import { chooser } from '../../src';
 import { callTimes } from './util';
 import { deepStrictEqual } from 'assert';
 
