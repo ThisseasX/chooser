@@ -1,5 +1,23 @@
 # chooser
 
+<p align="center">
+  <a href="https://www.npmjs.com/package/chooser">
+    <img src="https://img.shields.io/npm/v/chooser.svg" alt="npm version" >
+  </a>
+  <a href="https://packagephobia.now.sh/result?p=chooser">
+    <img src="https://packagephobia.now.sh/badge?p=chooser" alt="install size" >
+  </a>
+  <a href="https://codecov.io/gh/ThisseasX/chooser">
+    <img src="https://codecov.io/gh/ThisseasX/chooser/branch/master/graph/badge.svg" />
+  </a>
+  <a href="https://github.com/ThisseasX/chooser/blob/master/LICENSE.md">
+    <img src="https://img.shields.io/npm/l/chooser.svg" alt="license">
+  </a>
+  <a href="https://david-dm.org/ThisseasX/chooser">
+    <img src="https://david-dm.org/ThisseasX/chooser/status.svg" alt="dependency status">
+  </a>
+</p>
+
 A small, but fully featured, library that aims to completely replace `switch` case logic (which is unfavorable in Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.
 
 # Features
