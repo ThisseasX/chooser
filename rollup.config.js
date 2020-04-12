@@ -11,6 +11,7 @@ export default {
     cleaner({ targets: ['./dist'] }),
     sourcemaps(),
   ],
+  external: ['lodash/fp'],
   input: 'src/index.ts',
   output: [
     {
