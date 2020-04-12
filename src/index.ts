@@ -100,14 +100,18 @@ const getChoices = (choices: Choices | LazyChoices): Choices =>
   isFunction(choices) ? choices() : choices;
 
 /**
- * Transforms the user's input to string when the choices is a plain object, or
- * returns it as is.
+ * Transforms the user's input to string when the choices is a plain object and no equalityFn has
+ * been provided, else returns it as is.
  *
  * @param choices A `choice` array or a plain object.
  * @param input The user's input. Can be anything that will correspond to a `when` value.
  */
-const normalizeInput = (choices: Choices, input: any): any =>
-  isPlainObject(choices) ? toString(input) : input;
+const normalizeInput = (
+  choices: Choices,
+  input: any,
+  equalityFn?: EqualityFn,
+): any =>
+  isPlainObject(choices) && isUndefined(equalityFn) ? toString(input) : input;
 
 /**
  * Curries the `equalityFn` specified by the user.
@@ -127,7 +131,7 @@ const normalizeEqualityFn = (
 const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
   flow(
     (args: Args) => set('choices', getChoices(args.choices), args),
-    (args: Args) => set('input', normalizeInput(args.choices, args.input), args),
+    (args: Args) => set('input', normalizeInput(args.choices, args.input, equalityFn), args),
     (args: Args) => set('choices', normalizeChoices(args.choices), args),
     (args: Args) => set('equalityFn', normalizeEqualityFn(equalityFn), args),
     values,

@@ -1,6 +1,6 @@
 const testFn = () => 123;
 const testObj = { nested: { value: 2 } };
-const testEqualityFn = (input, when) => input.nested.value === when;
+const testEqualityFn = (input, when) => input.nested.value == when;
 
 const choices1 = [
   { when: 0, then: [1, 2, 3] },
@@ -121,6 +121,12 @@ const testCases = [
     choices: choices2,
     input: 5,
     expected: 123,
+  },
+  {
+    choices: choices2,
+    input: testObj,
+    expected: [4, 5, 6],
+    equalityFn: testEqualityFn,
   },
 ];
 

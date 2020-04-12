@@ -11,11 +11,11 @@ export default {
     terser(),
     cleaner({ targets: ['./dist'] }),
     externalGlobals({
-      'lodash/fp': '_',
+      'lodash': '_',
     }),
     sourcemaps(),
   ],
-  external: ['lodash/fp'],
+  external: (id) => /lodash/.test(id),
   input: 'src/index.ts',
   output: [
     {
