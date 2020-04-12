@@ -19,8 +19,8 @@
     "test": "jest --watchAll",
     "test:ci": "jest --ci",
     "build": "rollup -c",
-    "prepare": "npm run build",
-    "preversion": "npm run build"
+    "prepare": "npm run build && git add . && git commit -m \"Add build files\"",
+    "preversion": "npm run prepare"
   },
   "files": [
     "dist",
@@ -34,7 +34,6 @@
     "@types/jest": "^25.2.1",
     "@types/lodash": "^4.14.149",
     "@types/node": "^13.11.1",
-    "i": "^0.3.6",
     "jest": "^25.3.0",
     "npm": "^6.14.4",
     "rollup": "^2.6.0",
