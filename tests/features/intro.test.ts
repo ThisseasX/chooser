@@ -1,4 +1,4 @@
-const chooser = require('../..');
+import chooser from '../../src';
 
 const choose = chooser([
   { when: [1, 2], then: 'one' },
@@ -14,7 +14,7 @@ choose(4); // => 'one'
 choose(5); // => 'two'
 
 ///////////////////////////////////////////////////////////////////////////////
-const { strictEqual } = require('assert');
+import { strictEqual } from 'assert';
 
 describe('intro demo', () => {
   test('is accurate', () => {

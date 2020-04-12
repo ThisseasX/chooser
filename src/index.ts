@@ -1,4 +1,4 @@
-const {
+import {
   values,
   set,
   isFunction,
@@ -15,7 +15,28 @@ const {
   defaultTo,
   isPlainObject,
   negate,
-} = require('lodash/fp');
+  curryN,
+} from 'lodash/fp';
+
+type Choice = {
+  when?: any;
+  then?: any;
+  ref?: number;
+  use?: any;
+  eager?: Function;
+};
+
+type PlainObject = { [x: string]: any };
+type Choices = Choice[] | PlainObject;
+type LazyChoices = () => Choices;
+type EqualityFn = (input: any, when: any) => boolean;
+type CurriedEqualityFn = (input: any) => (when: any) => boolean;
+
+type Args = {
+  input: any;
+  choices: Choices | LazyChoices;
+  equalityFn?: EqualityFn;
+};
 
 const ARG_PATTERN = /^\{(?:\$(\d+?))?(?:#(.+?))?\}$/;
 
@@ -42,10 +63,10 @@ const ARG_PATTERN = /^\{(?:\$(\d+?))?(?:#(.+?))?\}$/;
  * //   { when: 'four', use: 'one' },
  * // ]
  *
- * @param {Object.<string, any>} choices A plain object.
+ * @param choices A plain object.
  */
-const transformChoiceObjectToArray = (choices) =>
-  Object.entries(choices).reduce((resultArray, [key, value]) => {
+const transformChoiceObjectToArray = (choices: PlainObject): Choices =>
+  Object.entries(choices).map(([key, value]) => {
     const match = ARG_PATTERN.exec(value);
 
     const [, ref, use] = match || [];
@@ -57,48 +78,62 @@ const transformChoiceObjectToArray = (choices) =>
       then: value,
     };
 
-    const filteredChoice = pickBy(negate(isUndefined), choice);
-
-    return [...resultArray, filteredChoice];
+    return pickBy(negate(isUndefined), choice);
   }, []);
 
 /**
  * If the `choices` argument is a plain object, it is transformed into a `choice` array,
  * else it is returned as is.
  *
- * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>} choices A `choice` array or a plain object.
+ * @param choices A `choice` array or a plain object.
  */
-const normalizeChoices = (choices) =>
+const normalizeChoices = (choices: Choices): Choices =>
   isPlainObject(choices) ? transformChoiceObjectToArray(choices) : choices;
 
 /**
  * If the `choices` argument is a function, it is called so as to extract
  * a plain object, or a `choice` array.
  *
- * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any> | (() => Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>)} choices A `choice` array or a plain object, or a function that returns either.
+ * @param choices A `choice` array or a plain object, or a function that returns either.
  */
-const getChoices = (choices) => (isFunction(choices) ? choices() : choices);
+const getChoices = (choices: Choices | LazyChoices): Choices =>
+  isFunction(choices) ? choices() : choices;
 
 /**
- * Transforms the user's input to string when the choices is a plain object, or
- * returns it as is.
+ * Transforms the user's input to string when the choices is a plain object and no equalityFn has
+ * been provided, else returns it as is.
  *
- * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>} choices A `choice` array or a plain object.
- * @param {any} input The user's input. Can be anything that will correspond to a `when` value.
+ * @param choices A `choice` array or a plain object.
+ * @param input The user's input. Can be anything that will correspond to a `when` value.
  */
-const normalizeInput = (choices, input) =>
-  isPlainObject(choices) ? toString(input) : input;
+const normalizeInput = (
+  choices: Choices,
+  input: any,
+  equalityFn?: EqualityFn,
+): any =>
+  isPlainObject(choices) && isUndefined(equalityFn) ? toString(input) : input;
+
+/**
+ * Curries the `equalityFn` specified by the user.
+ *
+ * @param equalityFn The equalityFn specified by the user.
+ */
+const normalizeEqualityFn = (
+  equalityFn?: EqualityFn,
+): CurriedEqualityFn | undefined =>
+  equalityFn && curryN<any, any, boolean>(2, equalityFn);
 
 /**
  * Normalizes the library's main args before passing them on.
  *
- * @param {{input?: any, choices?: Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>, equalityFn?: (input: any) => (when: any) => boolean}} args The library's main args supplied by the user, that will first be normalized.
+ * @param args The library's main args supplied by the user, that will first be normalized.
  */
-const normalizeArgs = ({ input, choices, equalityFn }) =>
+const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
   flow(
-    (args) => set('choices', getChoices(args.choices), args),
-    (args) => set('input', normalizeInput(args.choices, args.input), args),
-    (args) => set('choices', normalizeChoices(args.choices, args.input), args),
+    (args: Args) => set('choices', getChoices(args.choices), args),
+    (args: Args) => set('input', normalizeInput(args.choices, args.input, equalityFn), args),
+    (args: Args) => set('choices', normalizeChoices(args.choices), args),
+    (args: Args) => set('equalityFn', normalizeEqualityFn(equalityFn), args),
     values,
   )({ input, choices, equalityFn });
 
@@ -106,12 +141,17 @@ const normalizeArgs = ({ input, choices, equalityFn }) =>
  * Finds a `choice` entry from a `choice` array based on the user's input. It can recursively refer to itself with a
  * different index, if a `ref` is specified in the choice.
  *
- * @param {any} input The user's input. Can be anything that will correspond to a `when` value.
- * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>} choices A `choice` array or a plain object.
- * @param {(input: any) => (when: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
- * @param {number} index Used to recursively refer to a different choice entry by using a `ref`.
+ * @param input The user's input. Can be anything that will correspond to a `when` value.
+ * @param choices A `choice` array or a plain object.
+ * @param equalityFn Used to override the default equality function `eq` from `lodash`.
+ * @param index Used to recursively refer to a different choice entry by using a `ref`.
  */
-const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
+const findChoiceFromArray = (
+  input: any,
+  choices: Choices,
+  equalityFn: CurriedEqualityFn = eq,
+  index?: number,
+): Choice => {
   return flow(
     !isUndefined(index)
       ? constant(choices[index])
@@ -119,7 +159,7 @@ const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
           isArray(when) ? when.some(equalityFn(input)) : equalityFn(input)(when),
         ),
     defaultTo({}),
-    (selectedChoice) =>
+    (selectedChoice: Choice) =>
       !isUndefined(selectedChoice.ref)
         ? findChoiceFromArray(input, choices, equalityFn, selectedChoice.ref)
         : !isUndefined(selectedChoice.use)
@@ -145,12 +185,16 @@ const findChoiceFromArray = (input, choices, equalityFn = eq, index) => {
  * As an escape hatch for the above lazy evaluation mechanism, a function can be specified under the `eager` key,
  * and it will be returned as is, without it being executed to extract its result.
  *
- * @param {Array<{ when: any, then?: any, ref?: number, use?: any, eager?: Function }> | Object.<string, any>} choices A `choice` array or a plain object.
- * @param {any} defaultValue A default value to be returned if the `input` does not yield a choice.
- * @param {(input: any) => (when: any) => boolean} equalityFn Used to override the default equality function `eq` from `lodash`.
+ * @param choices A `choice` array or a plain object.
+ * @param defaultValue A default value to be returned if the `input` does not yield a choice.
+ * @param equalityFn Used to override the default equality function `eq` from `lodash`.
  */
-const chooser = (choices, defaultValue, equalityFn) =>
-  function choose(input, equalityFnOverride) {
+const chooser = (
+  choices: Choices | LazyChoices,
+  defaultValue?: any,
+  equalityFn?: EqualityFn,
+) =>
+  function choose(input: any, equalityFnOverride?: EqualityFn): any {
     return flow(
       spread(findChoiceFromArray),
       (choice) =>
@@ -165,4 +209,4 @@ const chooser = (choices, defaultValue, equalityFn) =>
     );
   };
 
-module.exports = chooser;
+export default chooser;

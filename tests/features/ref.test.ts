@@ -1,17 +1,19 @@
-const chooser = require('../..');
+import chooser from '../../src';
 
 const choose = chooser({
-  2: 'two',
   1: 'one',
+  2: 'two',
   3: '{$0}',
 });
 
-choose(3); // => 'one' instead of the usually expected 'two'
+choose(1); // => 'one'
+choose(2); // => 'two'
+choose(3); // => 'one'
 
 ///////////////////////////////////////////////////////////////////////////////
-const { strictEqual } = require('assert');
+import { strictEqual } from 'assert';
 
-describe('sorted keys demo', () => {
+describe('ref demo', () => {
   test('is accurate', () => {
     strictEqual(choose(1), 'one');
     strictEqual(choose(2), 'two');
