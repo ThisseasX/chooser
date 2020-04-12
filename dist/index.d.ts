@@ -33,4 +33,4 @@ declare type EqualityFn = (input: any, when: any) => boolean;
  * @param equalityFn Used to override the default equality function `eq` from `lodash`.
  */
 declare const chooser: (choices: PlainObject | Choice[] | LazyChoices, defaultValue?: any, equalityFn?: EqualityFn | undefined) => (input: any, equalityFnOverride?: EqualityFn | undefined) => any;
-export default chooser;
+export { chooser };

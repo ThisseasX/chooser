@@ -210,4 +210,4 @@ const chooser = (
     );
   };
 
-export default chooser;
+export { chooser };
