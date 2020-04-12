@@ -19,7 +19,7 @@ import {
 } from 'lodash/fp';
 
 type Choice = {
-  when?: any;
+  when: any;
   then?: any;
   ref?: number;
   use?: any;
@@ -131,7 +131,8 @@ const normalizeEqualityFn = (
 const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
   flow(
     (args: Args) => set('choices', getChoices(args.choices), args),
-    (args: Args) => set('input', normalizeInput(args.choices, args.input, equalityFn), args),
+    (args: Args) =>
+      set('input', normalizeInput(args.choices, args.input, equalityFn), args),
     (args: Args) => set('choices', normalizeChoices(args.choices), args),
     (args: Args) => set('equalityFn', normalizeEqualityFn(equalityFn), args),
     values,

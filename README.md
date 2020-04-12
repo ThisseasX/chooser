@@ -6,10 +6,14 @@ A small, but fully featured, library that aims to completely replace `switch` ca
 
 - Map cases to results.
 - Map multiple cases to the same result.
+- Customize the equality function used to produce a match, either at case declaration, or at the time of input.
 - Refer from one case to another by `ref`-ing its index.
 - Refer from one case to another by `use`-ing its `when` value.
 - Leverage the [lazy](https://en.wikipedia.org/wiki/Lazy_evaluation) nature of functions to compute a result only when needed, and not at the time of the case declaration.
 - If a function is intended to be returned as is, it can be put under the `eager` key.
+- Written in [TypeScript](https://www.typescriptlang.org/) and bundled with [Rollup](https://rollupjs.org/guide/en/), featuring:
+  - A CommonJS module for node.
+  - An ES Module for node.
 
 # Installation
 
@@ -25,15 +29,15 @@ const chooser = require('chooser');
 const choose = chooser([
   { when: [1, 2], then: 'one' },
   { when: 3, then: 'two' },
-  { when: 4, ref: 0 }
-  { when: 5, use: 3 }
+  { when: 4, ref: 0 },
+  { when: 5, use: 3 },
 ]);
 
-choose(1) // => 'one'
-choose(2) // => 'one'
-choose(3) // => 'two'
-choose(4) // => 'one'
-choose(5) // => 'two'
+choose(1); // => 'one'
+choose(2); // => 'one'
+choose(3); // => 'two'
+choose(4); // => 'one'
+choose(5); // => 'two'
 ```
 
 # Terminology
@@ -66,15 +70,15 @@ const chooser = require('chooser');
 const choose = chooser([
   { when: [1, 2], then: 'one' },
   { when: 3, then: 'two' },
-  { when: 4, ref: 0 }
-  { when: 5, use: 3 }
+  { when: 4, ref: 0 },
+  { when: 5, use: 3 },
 ]);
 
-choose(1) // => 'one'
-choose(2) // => 'one'
-choose(3) // => 'two'
-choose(4) // => 'one'
-choose(5) // => 'two'
+choose(1); // => 'one'
+choose(2); // => 'one'
+choose(3); // => 'two'
+choose(4); // => 'one'
+choose(5); // => 'two'
 ```
 
 Leveraging lazy evaluation:
@@ -123,21 +127,35 @@ choose(2); // => 'two'
 choose('2'); // => 'two'
 ```
 
-> **Note**: When using a plain object, the input is automatically converted to a string.
+> **Note**: When using a plain object without specifying an `equalityFn` (see below), the input is automatically converted to a string.
 
-Using special keys in plain objects:
+Using `use` shorthand in plain objects:
+
+```js
+const choose = chooser({
+  1: 'one',
+  2: 'two',
+  3: '{#2}',
+});
+
+choose(1); // => 'one'
+choose(2); // => 'two'
+choose(3); // => 'two'
+```
+
+Using `ref` shorthand in plain objects:
 
 ```js
 const chooser = require('chooser');
 
 const choose = chooser({
   1: 'one',
-  2: { ref: 0 },
-  3: { use: 1 },
+  2: 'two',
+  3: '{$0}',
 });
 
 choose(1); // => 'one'
-choose(2); // => 'one'
+choose(2); // => 'two'
 choose(3); // => 'one'
 ```
 
@@ -151,52 +169,18 @@ const chooser = require('chooser');
 const choose = chooser({
   2: 'two',
   1: 'one',
-  3: { ref: 0 },
+  3: '{$0}',
 });
 
 choose(3); // => 'one' instead of the usually expected 'two'
 ```
 
-Using a plain object as a `choice` in an array of `choices`:
+Providing a custom `equalityFn` at case declaration:
 
 ```js
 const chooser = require('chooser');
 
-const choose = chooser([
-  { 1: 'one' }
-  { 2: 'two' }
-]);
-
-choose(1); // => undefined
-choose(2); // => undefined
-choose('1'); // => 'one'
-choose('2'); // => 'two'
-```
-
-> **Note**: If a `choice` object is created as a plain object (not recommended), the default strict equality function will not match its key if the input is a number, as object keys are always strings.
-
-Instead it can be fixed by providing a non-strict equality function.
-
-```js
-const chooser = require('chooser');
-
-const equalityFn = input => when => input == when;
-
-const choose = chooser([
-  { 1: 'one' }
-  { 2: 'two' }
-], undefined, equalityFn);
-
-choose(1); // => 'one'
-choose(2); // => 'two'
-```
-
-Another creative use of `equalityFn`:
-
-```js
-const chooser = require('chooser');
-
-const equalityFn = (input) => (when) => input.nested.value == when;
+const equalityFn = (input, when) => input.nested.value == when;
 
 const choose = chooser(
   [
@@ -212,6 +196,26 @@ const obj2 = { nested: { value: 2 } };
 
 choose(obj1); // => 'one'
 choose(obj2); // => 'two'
+```
+
+Providing a custom `equalityFn` at the time of input:
+
+```js
+const equalityFnPerson = (input, when) => input.person.age == when;
+const equalityFnDog = (input, when) => input.dog.age == when;
+
+const choose = chooser([
+  { when: 28, then: 'I am 28 years old!' },
+  { when: 2, then: 'Woof woof!' },
+]);
+
+const data = {
+  person: { age: 28 },
+  dog: { age: 2 },
+};
+
+choose(data, equalityFnPerson); // => 'I am 28 years old!'
+choose(data, equalityFnDog); // => 'Woof woof!'
 ```
 
 Specifying a `defaultValue`:
@@ -232,4 +236,4 @@ choose(3); // => 'default string'
 
 # Closing Notes
 
-Thank you for using this library. I hope it helps you write better, declarative code, faster, without any duplication, or resorting to functions with `switch` cases, or very weak mapper functions.
+Thank you for using this library. I hope it helps you write better, more declarative code, faster, without any duplication, or resorting to functions with `switch` cases, or weak mapper functions.
