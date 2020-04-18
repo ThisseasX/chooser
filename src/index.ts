@@ -48,9 +48,9 @@ type Args = {
 
 const ARG_PATTERN = /^\{(?:\$(\d+?))?(?:#(.+?))?\}$/;
 
-function isDefined<T>(x?: T): x is T  {
+function isDefined<T>(x?: T): x is T {
   return negate(isUndefined)(x);
-};
+}
 
 /**
  * Transforms a plain object to a `choice` array.
@@ -100,7 +100,9 @@ const transformChoiceObjectToArray = (choices: PlainObject): Choices =>
  * @param choices A `choice` array or a plain object.
  */
 const normalizeChoices = (choices: Choices): Choices =>
-  isPlainObject(choices) ? transformChoiceObjectToArray(choices) : choices;
+  isPlainObject(choices)
+    ? transformChoiceObjectToArray(choices)
+    : choices;
 
 /**
  * If the `choices` argument is a function, it is called so as to extract
@@ -109,7 +111,9 @@ const normalizeChoices = (choices: Choices): Choices =>
  * @param choices A `choice` array or a plain object, or a function that returns either.
  */
 const getChoices = (choices: Choices | LazyChoices): Choices =>
-  isFunction(choices) ? choices() : choices;
+  isFunction(choices)
+    ? choices()
+    : choices;
 
 /**
  * Transforms the user's input to string when the choices is a plain object and no equalityFn has
@@ -123,7 +127,9 @@ const normalizeInput = (
   input: any,
   equalityFn?: EqualityFn,
 ): any =>
-  isPlainObject(choices) && isUndefined(equalityFn) ? toString(input) : input;
+  isPlainObject(choices) && isUndefined(equalityFn)
+    ? toString(input)
+    : input;
 
 /**
  * Curries the `equalityFn` specified by the user.
@@ -163,11 +169,11 @@ const findChoiceFromArray = (
   choices: Choice[],
   equalityFn: CurriedEqualityFn = eq,
   index?: number,
-): Choice => {
-  return flow(
+): Choice =>
+  flow(
     cond<Choice[], any>([
       [constant(isDefined(index)),
-        choice => isDefined(index) && nth(index, choice)],
+        nth(<number>index)],
       [stubTrue,
         find(({ when }) =>
           isArray(when) ? when.some(equalityFn(input)) : equalityFn(input)(when),
@@ -183,7 +189,6 @@ const findChoiceFromArray = (
         identity],
     ]),
   )(choices);
-};
 
 /**
  * The heart of this library, a curried function which stores the specified choices (and extra options) in the first call,
