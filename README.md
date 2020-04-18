@@ -7,6 +7,9 @@
   <a href="https://packagephobia.now.sh/result?p=chooser">
     <img src="https://packagephobia.now.sh/badge?p=chooser" alt="install size" >
   </a>
+  <a href="https://travis-ci.org/github/ThisseasX/chooser">
+    <img src="https://travis-ci.org/ThisseasX/chooser.svg?branch=master" />
+  </a>
   <a href="https://codecov.io/gh/ThisseasX/chooser">
     <img src="https://codecov.io/gh/ThisseasX/chooser/branch/master/graph/badge.svg" />
   </a>
