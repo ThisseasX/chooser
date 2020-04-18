@@ -13,7 +13,7 @@
   <a href="https://codecov.io/gh/ThisseasX/chooser">
     <img src="https://codecov.io/gh/ThisseasX/chooser/branch/master/graph/badge.svg" />
   </a>
-  <a href="https://github.com/ThisseasX/chooser/blob/master/LICENSE.md">
+  <a href="https://github.com/ThisseasX/chooser/blob/master/LICENSE">
     <img src="https://img.shields.io/npm/l/chooser.svg" alt="license">
   </a>
   <a href="https://david-dm.org/ThisseasX/chooser">
