@@ -1,5 +1,6 @@
 import {
   __,
+  some,
   has,
   nth,
   partialRight,
@@ -156,6 +157,30 @@ const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
   )({ input, choices, equalityFn });
 
 /**
+ * Used to find the desired `choice` among specified `choices`.
+ *
+ * The first call partially applies the user's `input` and the specified `equalityFn`.
+ *
+ * Returns a predicate that is called with a `choice` and produces a boolean whether it
+ * matches the user's `input` or not, according to the `equalityFn`.
+ *
+ * @param input The user's input. Can be anything that will correspond to a `when` value.
+ * @param equalityFn Used to check for equality between the user's input and a choice's `when` value.
+ */
+const matchingChoice = (input: any, equalityFn: CurriedEqualityFn) => (
+  choice: Choice,
+): boolean =>
+  flow(
+    get('when'),
+    cond<any, boolean>([
+      [isArray,
+        some(equalityFn(input))],
+      [stubTrue,
+        equalityFn(input)],
+    ]),
+  )(choice);
+
+/**
  * Finds a `choice` entry from a `choice` array based on the user's input. It can recursively refer to itself with a
  * different index, if a `ref` is specified in the choice.
  *
@@ -175,9 +200,7 @@ const findChoiceFromArray = (
       [constant(isDefined(index)),
         nth(<number>index)],
       [stubTrue,
-        find(({ when }) =>
-          isArray(when) ? when.some(equalityFn(input)) : equalityFn(input)(when),
-        )],
+        find(matchingChoice(input, equalityFn))],
     ]),
     defaultTo({}),
     cond<Choice, any>([
@@ -216,6 +239,16 @@ const chooser = (
   defaultValue?: any,
   equalityFn?: EqualityFn,
 ) =>
+  /**
+   * The function returned by calling `chooser`. Takes user input of any form and tries to match it
+   * against a specific `choice` from the `choices` specified in the `chooser` call.
+   *
+   * It can optionally take an equality function to override the equality function used, just for
+   * this call of `choose`.
+   *
+   * @param input The user's input. Can be anything that will correspond to a `when` value.
+   * @param equalityFnOverride Used to override the existing equality function just for this call.
+   */
   function choose(input: any, equalityFnOverride?: EqualityFn): any {
     return flow(
       normalizeArgs,
