@@ -1,5 +1,7 @@
 import {
   __,
+  entries,
+  map,
   some,
   has,
   nth,
@@ -54,6 +56,24 @@ function isDefined<T>(x?: T): x is T {
 }
 
 /**
+ * Converts a simple `PlainObject` entry into a `Choice` object.
+ *
+ * @param entry An entry from a `PlainObject` that should be converted into
+ * a `Choice` object.
+ */
+const entryToChoice = ([key, value]: [string, any]) =>
+  flow(
+    ({ when, then }: Choice) => [{ when, then }, ARG_PATTERN.exec(value) || []],
+    ([{ when, then }, match]: [Choice, RegExpExecArray]) => ({
+      when,
+      then,
+      ref: match[1],
+      use: match[2],
+    }),
+    pickBy(isDefined),
+  )({ when: key, then: value });
+
+/**
  * Transforms a plain object to a `choice` array.
  * Keys will be mapped to `when` and values to `then`.
  * Values can use the `ref` and `use` shorthand syntax like `'{$0}'` and `'{#one}'`,
@@ -79,20 +99,10 @@ function isDefined<T>(x?: T): x is T {
  * @param choices A plain object.
  */
 const transformChoiceObjectToArray = (choices: PlainObject): Choices =>
-  Object.entries(choices).map(([key, value]) => {
-    const match = ARG_PATTERN.exec(value);
-
-    const [, ref, use] = match || [];
-
-    const choice = {
-      when: key,
-      ref,
-      use,
-      then: value,
-    };
-
-    return pickBy(isDefined, choice);
-  }, []);
+  flow(
+    entries,
+    map(entryToChoice)
+  )(choices);
 
 /**
  * If the `choices` argument is a plain object, it is transformed into a `choice` array,
