@@ -1,4 +1,9 @@
 import {
+  __,
+  has,
+  nth,
+  partialRight,
+  identity,
   values,
   set,
   isFunction,
@@ -9,6 +14,7 @@ import {
   flow,
   find,
   eq,
+  get,
   pickBy,
   result,
   spread,
@@ -16,6 +22,8 @@ import {
   isPlainObject,
   negate,
   curryN,
+  cond,
+  stubTrue,
 } from 'lodash/fp';
 
 type Choice = {
@@ -39,6 +47,10 @@ type Args = {
 };
 
 const ARG_PATTERN = /^\{(?:\$(\d+?))?(?:#(.+?))?\}$/;
+
+function isDefined<T>(x?: T): x is T  {
+  return negate(isUndefined)(x);
+};
 
 /**
  * Transforms a plain object to a `choice` array.
@@ -78,7 +90,7 @@ const transformChoiceObjectToArray = (choices: PlainObject): Choices =>
       then: value,
     };
 
-    return pickBy(negate(isUndefined), choice);
+    return pickBy(isDefined, choice);
   }, []);
 
 /**
@@ -131,8 +143,7 @@ const normalizeEqualityFn = (
 const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
   flow(
     (args: Args) => set('choices', getChoices(args.choices), args),
-    (args: Args) =>
-      set('input', normalizeInput(args.choices, args.input, equalityFn), args),
+    (args: Args) => set('input', normalizeInput(args.choices, args.input, equalityFn), args),
     (args: Args) => set('choices', normalizeChoices(args.choices), args),
     (args: Args) => set('equalityFn', normalizeEqualityFn(equalityFn), args),
     values,
@@ -149,23 +160,28 @@ const normalizeArgs = ({ input, choices, equalityFn }: Args): any[] =>
  */
 const findChoiceFromArray = (
   input: any,
-  choices: Choices,
+  choices: Choice[],
   equalityFn: CurriedEqualityFn = eq,
   index?: number,
 ): Choice => {
   return flow(
-    !isUndefined(index)
-      ? constant(choices[index])
-      : find(({ when }) =>
+    cond<Choice[], any>([
+      [constant(isDefined(index)),
+        choice => isDefined(index) && nth(index, choice)],
+      [stubTrue,
+        find(({ when }) =>
           isArray(when) ? when.some(equalityFn(input)) : equalityFn(input)(when),
-        ),
+        )],
+    ]),
     defaultTo({}),
-    (selectedChoice: Choice) =>
-      !isUndefined(selectedChoice.ref)
-        ? findChoiceFromArray(input, choices, equalityFn, selectedChoice.ref)
-        : !isUndefined(selectedChoice.use)
-        ? findChoiceFromArray(selectedChoice.use, choices, equalityFn)
-        : selectedChoice,
+    cond<Choice, any>([
+      [has('ref'),
+        flow(get('ref'), partialRight(findChoiceFromArray, [input, choices, equalityFn, __]))],
+      [has('use'),
+        flow(get('use'), partialRight(findChoiceFromArray, [__, choices, equalityFn]))],
+      [stubTrue,
+        identity],
+    ]),
   )(choices);
 };
 
@@ -197,17 +213,20 @@ const chooser = (
 ) =>
   function choose(input: any, equalityFnOverride?: EqualityFn): any {
     return flow(
+      normalizeArgs,
       spread(findChoiceFromArray),
-      (choice) =>
-        !isUndefined(choice.eager) ? choice.eager : result('then', choice),
+      cond<Choice, any>([
+        [has('eager'),
+          get('eager')],
+        [stubTrue,
+          result('then')],
+      ]),
       defaultTo(defaultValue),
-    )(
-      normalizeArgs({
-        input,
-        choices,
-        equalityFn: equalityFnOverride || equalityFn,
-      }),
-    );
+    )({
+      input,
+      choices,
+      equalityFn: equalityFnOverride || equalityFn,
+    });
   };
 
 export { chooser };
