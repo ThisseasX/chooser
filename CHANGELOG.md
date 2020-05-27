@@ -1,5 +1,11 @@
 # chooser changelog
 
+## 3.0.2
+
+_2020-05-27_
+
+Minor documentation changes and refactoring.
+
 ## 3.0.1
 
 _2020-04-12_
