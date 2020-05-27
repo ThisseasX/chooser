@@ -21,7 +21,7 @@
   </a>
 </p>
 
-A small, but fully featured, library that aims to completely replace `switch` case logic (which is unfavorable in Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.
+A small, but fully featured, library that aims to replace `switch` case logic (mainly to aid with Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.
 
 # Features
 
@@ -257,4 +257,4 @@ choose(3); // => 'default string'
 
 # Closing Notes
 
-Thank you for using this library. I hope it helps you write better, more declarative code, faster, without any duplication, or resorting to functions with `switch` cases, or weak mapper functions.
+Thank you for using this library. I hope it helps you write better, more declarative code, without any duplication or resorting to functions with `switch` cases or mapper functions.
