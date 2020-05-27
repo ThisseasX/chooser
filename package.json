@@ -1,6 +1,6 @@
 {
   "name": "chooser",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "A small, but fully featured, library that aims to replace `switch` case logic (mainly to aid with Functional Programming), with a simple declarative API for setting up a predefined map of cases, and choosing a result from it based on input.",
   "author": "ThisseasX",
   "license": "MIT",
